@@ -41,11 +41,11 @@ export default async function ContaPage() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <Link href="/checklist/bebe" className="rounded-card bg-white border border-plum/10 p-5 block hover:border-plum/30 transition">
-          <p className="font-display text-lg text-plum-dark mb-2">Mala do bebê</p>
+          <p className="font-display text-lg text-plum-dark mb-2 flex items-center gap-2">🍼 Mala do bebê</p>
           <Barra total={bebe.total} marcados={bebe.marcados} />
         </Link>
         <Link href="/checklist/mae" className="rounded-card bg-white border border-plum/10 p-5 block hover:border-plum/30 transition">
-          <p className="font-display text-lg text-plum-dark mb-2">Mala da mãe</p>
+          <p className="font-display text-lg text-plum-dark mb-2 flex items-center gap-2">💜 Mala da mãe</p>
           <Barra total={mae.total} marcados={mae.marcados} />
         </Link>
       </div>

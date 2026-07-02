@@ -20,7 +20,12 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 bg-base/95 backdrop-blur border-b border-plum/10">
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="font-display text-xl font-semibold text-plum-dark">
+        <Link href="/" className="flex items-center gap-2 font-display text-xl font-semibold text-plum-dark">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect x="4" y="12" width="24" height="16" rx="3" fill="currentColor"/>
+            <rect x="12" y="7" width="8" height="6" rx="2" fill="none" stroke="currentColor" strokeWidth="2.2"/>
+            <rect x="4" y="18" width="24" height="3" fill="#E8A33D"/>
+          </svg>
           Mala da Maternidade
         </Link>
 

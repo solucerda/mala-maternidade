@@ -1,6 +1,7 @@
 import './globals.css';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
+import MobileTabBar from '@/components/MobileTabBar';
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
@@ -17,8 +18,9 @@ export default function RootLayout({ children }) {
     <html lang="pt-BR">
       <body className="font-body min-h-screen flex flex-col">
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-20 sm:pb-0">{children}</main>
         <SiteFooter />
+        <MobileTabBar />
       </body>
     </html>
   );
