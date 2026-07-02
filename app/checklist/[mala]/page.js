@@ -1,19 +1,17 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import ChecklistList from '@/components/ChecklistList';
+import HeartsBackground from '@/components/HeartsBackground';
 
 const CONFIG = {
-  bebe: { titulo: 'Mala do bebê', cor: 'sage', descricao: 'Tudo que o recém-nascido vai precisar nos primeiros dias.' },
-  mae: { titulo: 'Mala da mãe', cor: 'rose', descricao: 'Conforto e cuidado pra você durante a internação.' },
+  bebe: { titulo: 'Mala do bebê', descricao: 'Tudo que o recém-nascido vai precisar nos primeiros dias.' },
+  mae: { titulo: 'Mala da mãe', descricao: 'Conforto e cuidado pra você durante a internação.' },
 };
 
 export async function generateMetadata({ params }) {
   const info = CONFIG[params.mala];
   if (!info) return {};
-  return {
-    title: info.titulo,
-    description: info.descricao,
-  };
+  return { title: info.titulo, description: info.descricao };
 }
 
 export default async function ChecklistPage({ params }) {
@@ -22,7 +20,7 @@ export default async function ChecklistPage({ params }) {
 
   const supabase = createClient();
 
-const { data: items, error: itemsError } = await supabase
+  const { data: items, error: itemsError } = await supabase
     .from('items')
     .select('*')
     .eq('mala', params.mala)
@@ -49,22 +47,27 @@ const { data: items, error: itemsError } = await supabase
   const categorias = [...new Set((items || []).map((i) => i.categoria))];
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="font-display text-3xl font-semibold text-plum-dark">{info.titulo}</h1>
-      <p className="text-ink/70 mt-1">{info.descricao}</p>
+    <div>
+      <section className="relative overflow-hidden">
+        <HeartsBackground />
+        <div className="relative max-w-3xl mx-auto px-4 pt-12 pb-10">
+          <h1 className="page-title">{info.titulo}</h1>
+          <p className="page-subtitle">{info.descricao}</p>
 
-      {!user && (
-        <div className="mt-4 rounded-card bg-marigold/15 border border-marigold/30 px-4 py-3 text-sm">
-          Você está vendo a lista sem cadastro. <a href="/cadastro" className="underline font-medium">Crie uma conta grátis</a> pra marcar os itens e salvar seu progresso.
+          {!user && (
+            <div className="mt-4 rounded-card bg-marigold/15 border border-marigold/30 px-4 py-3 text-sm">
+              Você está vendo a lista sem cadastro. <a href="/cadastro" className="underline font-medium">Crie uma conta grátis</a> pra marcar os itens e salvar seu progresso.
+            </div>
+          )}
+
+          <ChecklistList
+            items={items || []}
+            categorias={categorias}
+            statusInicial={statusMap}
+            logada={!!user}
+          />
         </div>
-      )}
-
-      <ChecklistList
-        items={items || []}
-        categorias={categorias}
-        statusInicial={statusMap}
-        logada={!!user}
-      />
+      </section>
     </div>
   );
 }

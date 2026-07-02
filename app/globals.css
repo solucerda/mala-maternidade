@@ -17,6 +17,22 @@ body {
   font-family: 'Fraunces', serif;
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 3.5s ease-in-out infinite;
+}
+
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+.animate-bounce-soft {
+  animation: bounce-soft 1.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -28,4 +44,42 @@ body {
 :focus-visible {
   outline: 3px solid #E8A33D;
   outline-offset: 2px;
+}
+
+/* ============================================================
+   Sistema de estilo reutilizável do site.
+   Mude aqui, reflete em todas as páginas que usam essas classes.
+   ============================================================ */
+@layer components {
+  .card {
+    @apply rounded-card bg-white border border-plum/10 p-5;
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 rounded-full bg-plum text-white font-medium hover:bg-plum-dark transition;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-full bg-rose text-white font-medium hover:opacity-90 transition;
+  }
+
+  .btn-outline {
+    @apply px-6 py-3 rounded-full border border-plum/20 font-medium hover:bg-plum/5 transition;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-lg border border-plum/20 focus:border-plum outline-none;
+  }
+
+  .page-title {
+    @apply font-display text-3xl font-semibold text-plum-dark;
+  }
+
+  .page-subtitle {
+    @apply text-ink/70 mt-1;
+  }
+
+  .link-plum {
+    @apply text-plum underline;
+  }
 }

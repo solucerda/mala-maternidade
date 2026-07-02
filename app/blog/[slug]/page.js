@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import HeartsBackground from '@/components/HeartsBackground';
 
 export async function generateMetadata({ params }) {
   const supabase = createClient();
@@ -10,10 +11,7 @@ export async function generateMetadata({ params }) {
     .single();
 
   if (!post) return {};
-  return {
-    title: post.titulo,
-    description: post.resumo,
-  };
+  return { title: post.titulo, description: post.resumo };
 }
 
 export default async function PostPage({ params }) {
@@ -28,15 +26,25 @@ export default async function PostPage({ params }) {
   if (!post) notFound();
 
   return (
-    <article className="max-w-2xl mx-auto px-4 py-12">
-      <p className="text-xs text-ink/40 mb-2">
-        {new Date(post.created_at).toLocaleDateString('pt-BR')}
-      </p>
-      <h1 className="font-display text-3xl text-plum-dark mb-6">{post.titulo}</h1>
-      <div
-        className="prose prose-sm max-w-none text-ink/80 leading-relaxed whitespace-pre-wrap"
-        dangerouslySetInnerHTML={{ __html: post.conteudo }}
-      />
-    </article>
+    <div className="relative overflow-hidden">
+      <HeartsBackground />
+      <article className="relative max-w-2xl mx-auto px-4 py-12">
+        {post.imagem_capa && (
+          <img
+            src={post.imagem_capa}
+            alt=""
+            className="w-full h-56 sm:h-72 object-cover rounded-card mb-6"
+          />
+        )}
+        <p className="text-xs text-ink/40 mb-2">
+          {new Date(post.created_at).toLocaleDateString('pt-BR')}
+        </p>
+        <h1 className="page-title mb-6">{post.titulo}</h1>
+        <div
+          className="prose prose-sm max-w-none text-ink/80 leading-relaxed whitespace-pre-wrap"
+          dangerouslySetInnerHTML={{ __html: post.conteudo }}
+        />
+      </article>
+    </div>
   );
 }

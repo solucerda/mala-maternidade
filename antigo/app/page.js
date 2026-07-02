@@ -1,42 +1,31 @@
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
 import LiveDemo from '@/components/LiveDemo';
-import HeartsBackground from '@/components/HeartsBackground';
-import { createClient } from '@/lib/supabase/server';
 
-async function progressoDaMala(supabase, userId, mala) {
-  const { data: items } = await supabase.from('items').select('id').eq('mala', mala);
-  const ids = (items || []).map((i) => i.id);
-  if (ids.length === 0) return false;
-
-  const { data: status } = await supabase
-    .from('user_item_status')
-    .select('item_id')
-    .eq('user_id', userId)
-    .eq('marcado', true)
-    .in('item_id', ids);
-
-  return (status || []).length === ids.length;
-}
-
-export default async function Home() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let bebeCompleta = false;
-  let maeCompleta = false;
-
-  if (user) {
-    bebeCompleta = await progressoDaMala(supabase, user.id, 'bebe');
-    maeCompleta = await progressoDaMala(supabase, user.id, 'mae');
-  }
-
+export default function Home() {
   return (
     <div>
       <section className="relative overflow-hidden">
-        <HeartsBackground />
+        <div className="absolute inset-0 bg-gradient-to-b from-rose-light to-base" aria-hidden="true" />
+        <svg className="absolute inset-0 w-full h-full opacity-40" aria-hidden="true">
+          {[
+            { x: '8%', y: '15%', s: 18, o: 0.5 },
+            { x: '85%', y: '10%', s: 24, o: 0.4 },
+            { x: '15%', y: '75%', s: 14, o: 0.45 },
+            { x: '90%', y: '65%', s: 20, o: 0.35 },
+            { x: '50%', y: '5%', s: 12, o: 0.4 },
+            { x: '70%', y: '85%', s: 16, o: 0.3 },
+            { x: '30%', y: '40%', s: 10, o: 0.3 },
+          ].map((h, i) => (
+            <g key={i} transform={`translate(${h.x}, ${h.y})`} opacity={h.o}>
+              <path
+                d="M0,7 L-1.5,5.5 C-3.8,3.4 -5,1.6 -5,-0.4 C-5,-2.1 -3.7,-3.5 -2,-3.5 C-1,-3.5 -0.1,-3 0,-2.4 C0.1,-3 1,-3.5 2,-3.5 C3.7,-3.5 5,-2.1 5,-0.4 C5,1.6 3.8,3.4 1.5,5.5 Z"
+                fill="#C97B84"
+                transform={`scale(${h.s / 8})`}
+              />
+            </g>
+          ))}
+        </svg>
 
         <div className="relative max-w-2xl mx-auto px-4 pt-20 pb-16 text-center">
           <img
@@ -73,25 +62,19 @@ export default async function Home() {
           </p>
           <div className="flex justify-center gap-8 sm:gap-12">
             <Link href="/checklist/bebe" className="flex flex-col items-center group">
-              <div className="relative">
-                <img
-                  src="/imagens/mala-bebe.png"
-                  alt="Mala do bebê"
-                  className="w-32 sm:w-36 group-hover:scale-105 transition-transform"
-                />
-                {bebeCompleta && <SeloCompleta />}
-              </div>
+              <img
+                src="/imagens/mala-bebe.png"
+                alt="Mala do bebê"
+                className="w-32 sm:w-36 group-hover:scale-105 transition-transform"
+              />
             </Link>
 
             <Link href="/checklist/mae" className="flex flex-col items-center group">
-              <div className="relative">
-                <img
-                  src="/imagens/mala-mamae.png"
-                  alt="Mala da mamãe"
-                  className="w-32 sm:w-36 group-hover:scale-105 transition-transform"
-                />
-                {maeCompleta && <SeloCompleta />}
-              </div>
+              <img
+                src="/imagens/mala-mamae.png"
+                alt="Mala da mamãe"
+                className="w-32 sm:w-36 group-hover:scale-105 transition-transform"
+              />
             </Link>
           </div>
           <p className="mt-4 text-xs text-ink/50">
@@ -100,18 +83,5 @@ export default async function Home() {
         </Reveal>
       </section>
     </div>
-  );
-}
-
-function SeloCompleta() {
-  return (
-    <span
-      className="absolute -top-1 -right-1 w-9 h-9 rounded-full bg-sage flex items-center justify-center shadow-lg ring-4 ring-base"
-      title="Mala completa!"
-    >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-    </span>
   );
 }
