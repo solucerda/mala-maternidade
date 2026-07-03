@@ -82,20 +82,4 @@ body {
   .link-plum {
     @apply text-plum underline;
   }
-
-  .post-content h2 {
-    @apply font-display text-xl text-plum-dark mt-8 mb-3;
-  }
-
-  .post-content p {
-    @apply mb-4 leading-relaxed text-ink/80;
-  }
-
-  .post-content ul {
-    @apply list-disc pl-5 mb-4 space-y-1.5 text-ink/80;
-  }
-
-  .post-content strong {
-    @apply text-plum-dark font-medium;
-  }
 }

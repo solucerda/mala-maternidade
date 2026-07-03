@@ -29,10 +29,6 @@ export default async function AdminPage() {
           <p className="font-display text-lg text-plum-dark">Gerenciar posts do blog</p>
           <p className="text-sm text-ink/60 mt-1">Publique e edite artigos do blog.</p>
         </Link>
-        <Link href="/admin/categoria-artigos" className="rounded-card bg-white border border-plum/10 p-6 hover:border-plum/30 transition sm:col-span-2">
-          <p className="font-display text-lg text-plum-dark">📖 Artigos por categoria</p>
-          <p className="text-sm text-ink/60 mt-1">Associe artigos do blog às categorias do checklist (ex: "1ª troca").</p>
-        </Link>
       </div>
     </div>
   );

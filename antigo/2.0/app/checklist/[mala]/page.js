@@ -4,28 +4,8 @@ import ChecklistList from '@/components/ChecklistList';
 import HeartsBackground from '@/components/HeartsBackground';
 
 const CONFIG = {
-  bebe: {
-    titulo: 'Mala do bebê',
-    descricao: 'Tudo que o recém-nascido vai precisar nos primeiros dias.',
-    errosComuns: [
-      'Comprar roupas de tamanho RN demais — o bebê cresce rápido nas primeiras semanas',
-      'Esquecer os documentos (RG, comprovante de residência, carteirinha do convênio)',
-      'Levar produtos de higiene em excesso que não serão usados',
-      'Não separar os kits de troca com antecedência',
-      'Não confirmar com a maternidade quais itens ela já fornece',
-    ],
-  },
-  mae: {
-    titulo: 'Mala da mãe',
-    descricao: 'Conforto e cuidado pra você durante a internação.',
-    errosComuns: [
-      'Levar maquiagem e itens de beleza em excesso',
-      'Esquecer roupas confortáveis e adequadas pra amamentação',
-      'Não confirmar quais itens de higiene o hospital já fornece',
-      'Esquecer a roupa de saída — o corpo ainda estará com a barriga',
-      'Deixar pra montar a mala em cima da hora',
-    ],
-  },
+  bebe: { titulo: 'Mala do bebê', descricao: 'Tudo que o recém-nascido vai precisar nos primeiros dias.' },
+  mae: { titulo: 'Mala da mãe', descricao: 'Conforto e cuidado pra você durante a internação.' },
 };
 
 export async function generateMetadata({ params }) {
@@ -66,18 +46,6 @@ export default async function ChecklistPage({ params }) {
 
   const categorias = [...new Set((items || []).map((i) => i.categoria))];
 
-  const { data: relacoesArtigos } = await supabase
-    .from('categoria_artigos')
-    .select('categoria, posts(titulo, slug)')
-    .eq('mala', params.mala);
-
-  const artigosPorCategoria = {};
-  (relacoesArtigos || []).forEach((r) => {
-    if (!r.posts) return;
-    if (!artigosPorCategoria[r.categoria]) artigosPorCategoria[r.categoria] = [];
-    artigosPorCategoria[r.categoria].push({ titulo: r.posts.titulo, slug: r.posts.slug });
-  });
-
   return (
     <div>
       <section className="relative overflow-hidden">
@@ -97,19 +65,7 @@ export default async function ChecklistPage({ params }) {
             categorias={categorias}
             statusInicial={statusMap}
             logada={!!user}
-            artigosPorCategoria={artigosPorCategoria}
           />
-
-          <div className="card mt-4 bg-rose-light/40 border-rose/20">
-            <p className="font-display text-lg text-plum-dark mb-3">❌ Erros mais comuns</p>
-            <ul className="space-y-2">
-              {info.errosComuns.map((erro, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-ink/70">
-                  <span className="text-rose mt-0.5">•</span> {erro}
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </section>
     </div>

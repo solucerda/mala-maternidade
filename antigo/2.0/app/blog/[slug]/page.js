@@ -41,7 +41,7 @@ export default async function PostPage({ params }) {
         </p>
         <h1 className="page-title mb-6">{post.titulo}</h1>
         <div
-          className="post-content prose prose-sm max-w-none"
+          className="prose prose-sm max-w-none text-ink/80 leading-relaxed whitespace-pre-wrap"
           dangerouslySetInnerHTML={{ __html: post.conteudo }}
         />
       </article>

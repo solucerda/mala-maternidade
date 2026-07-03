@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import RichTextEditor from '@/components/RichTextEditor';
 
 function gerarSlug(texto) {
   return texto
@@ -79,13 +78,14 @@ export default function PostForm({ postInicial }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Conteúdo</label>
-        <RichTextEditor value={form.conteudo} onChange={(html) => update('conteudo', html)} />
+        <label className="block text-sm font-medium mb-1">Conteúdo (aceita HTML simples: &lt;p&gt;, &lt;h2&gt;, &lt;a&gt;, &lt;strong&gt;)</label>
+        <textarea required value={form.conteudo} onChange={(e) => update('conteudo', e.target.value)} rows={12}
+          className="w-full px-4 py-2.5 rounded-lg border border-plum/20 font-mono text-sm" />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Imagem de capa (URL completa ou caminho tipo /imagens/nome.jpg)</label>
-        <input value={form.imagem_capa} onChange={(e) => update('imagem_capa', e.target.value)} placeholder="/imagens/nome.jpg"
+        <label className="block text-sm font-medium mb-1">Imagem de capa (URL, opcional)</label>
+        <input type="url" value={form.imagem_capa} onChange={(e) => update('imagem_capa', e.target.value)}
           className="w-full px-4 py-2.5 rounded-lg border border-plum/20" />
       </div>
 
