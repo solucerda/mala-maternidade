@@ -15,7 +15,7 @@ export default async function AdminItensPage() {
     .order('categoria')
     .order('ordem');
 
-  const { data: ordem } = await supabase.from('categoria_ordem').select('mala, categoria, ordem, cor');
+  const { data: ordem } = await supabase.from('categoria_ordem').select('mala, categoria, ordem');
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">

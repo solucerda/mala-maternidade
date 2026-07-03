@@ -9,6 +9,31 @@ import { resolverCorHex } from '@/lib/coresCategoria';
 
 const NOME_MALA = { bebe: 'Mala do bebê', mae: 'Mala da mãe' };
 
+// Cor aleatória mas com saturação/luminosidade controladas, pra combinar com a identidade do site
+function corAleatoria() {
+  const h = Math.floor(Math.random() * 360);
+  const s = 45 + Math.floor(Math.random() * 20); // 45–65%
+  const l = 42 + Math.floor(Math.random() * 14); // 42–56%
+  return hslParaHex(h, s, l);
+}
+
+function hslParaHex(h, s, l) {
+  s /= 100;
+  l /= 100;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+  const toHex = (v) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
 export default function AdminItemsManager({ itemsIniciais, ordemIniciais }) {
   const [categoriasAbertas, setCategoriasAbertas] = useState(new Set());
   const [painelEditAberto, setPainelEditAberto] = useState(new Set());
@@ -55,7 +80,11 @@ export default function AdminItemsManager({ itemsIniciais, ordemIniciais }) {
   const ordemMap = Object.fromEntries(Object.entries(infoMap).map(([k, v]) => [k, v.ordem]));
 
   function categoriasOrdenadas(mala) {
-    return Object.keys(grupos[mala]).sort((a, b) => {
+    const doItens = Object.keys(grupos[mala]);
+    const doOrdem = ordemIniciais.filter((o) => o.mala === mala).map((o) => o.categoria);
+    const todas = [...new Set([...doItens, ...doOrdem])];
+
+    return todas.sort((a, b) => {
       const oa = ordemMap[`${mala}::${a}`] ?? Infinity;
       const ob = ordemMap[`${mala}::${b}`] ?? Infinity;
       if (oa !== ob) return oa - ob;
@@ -73,12 +102,18 @@ export default function AdminItemsManager({ itemsIniciais, ordemIniciais }) {
     const ordensDaMala = ordemIniciais.filter((o) => o.mala === mala).map((o) => o.ordem);
     const proximaOrdem = ordensDaMala.length ? Math.max(...ordensDaMala) + 1 : 1;
 
-    await supabase.from('categoria_ordem').upsert(
+    setOcupado(true);
+    const { error } = await supabase.from('categoria_ordem').upsert(
       { mala, categoria, ordem: proximaOrdem },
       { onConflict: 'mala,categoria' }
     );
+    setOcupado(false);
 
-    window.location.href = `/admin/itens/novo?mala=${mala}&categoria=${encodeURIComponent(categoria)}`;
+    if (error) {
+      alert(`Não foi possível criar a categoria: ${error.message}`);
+      return;
+    }
+    router.refresh();
   }
 
   async function salvarNome(mala, categoriaAtual, chave) {
@@ -130,18 +165,15 @@ export default function AdminItemsManager({ itemsIniciais, ordemIniciais }) {
     router.refresh();
   }
 
-  async function limparCor(mala, categoria) {
+  async function sortearCor(mala, categoria) {
     const chave = `${mala}::${categoria}`;
-    setCoresLocais((c) => {
-      const novo = { ...c };
-      delete novo[chave];
-      return novo;
-    });
+    const corHex = corAleatoria();
+    setCoresLocais((c) => ({ ...c, [chave]: corHex }));
 
     const ordemAtual = ordemMap[chave] ?? 1;
     setOcupado(true);
     await supabase.from('categoria_ordem').upsert(
-      { mala, categoria, ordem: ordemAtual, cor: null },
+      { mala, categoria, ordem: ordemAtual, cor: corHex },
       { onConflict: 'mala,categoria' }
     );
     setOcupado(false);
@@ -191,7 +223,7 @@ export default function AdminItemsManager({ itemsIniciais, ordemIniciais }) {
                 const chave = `${mala}::${categoria}`;
                 const aberta = categoriasAbertas.has(chave);
                 const painelAberto = painelEditAberto.has(chave);
-                const itens = grupos[mala][categoria];
+                const itens = grupos[mala][categoria] || [];
                 const corHex = coresLocais[chave] ?? resolverCorHex(infoMap[chave]?.cor, i);
 
                 return (
@@ -277,14 +309,14 @@ export default function AdminItemsManager({ itemsIniciais, ordemIniciais }) {
                               type="color"
                               value={corHex}
                               onChange={(e) => escolherCor(mala, categoria, e.target.value)}
-                              className="w-9 h-9 rounded-lg border border-plum/20 cursor-pointer p-0.5 bg-white"
+                              className="w-10 h-10 rounded-full border-2 border-plum/20 cursor-pointer overflow-hidden p-0.5 bg-white shadow-sm"
                             />
                             <button
-                              onClick={() => limparCor(mala, categoria)}
+                              onClick={() => sortearCor(mala, categoria)}
                               disabled={ocupado}
                               className="text-xs link-plum disabled:opacity-50"
                             >
-                              Usar cor automática
+                              🎲 Sortear cor aleatória
                             </button>
                           </div>
                         </div>
@@ -309,6 +341,9 @@ export default function AdminItemsManager({ itemsIniciais, ordemIniciais }) {
                         >
                           + Adicionar item nessa categoria
                         </Link>
+                        {itens.length === 0 && (
+                          <p className="text-sm text-ink/50">Essa categoria ainda não tem itens.</p>
+                        )}
                         {itens.map((item) => (
                           <div key={item.id} className="flex items-center justify-between gap-4 py-2 border-t border-plum/5 first:border-t-0">
                             <p className="font-medium truncate">{item.nome}</p>

@@ -3,6 +3,9 @@ import Reveal from '@/components/Reveal';
 import LiveDemo from '@/components/LiveDemo';
 import { createClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function progressoDaMala(supabase, userId, mala) {
   const { data: items } = await supabase.from('items').select('id').eq('mala', mala);
   const ids = (items || []).map((i) => i.id);
