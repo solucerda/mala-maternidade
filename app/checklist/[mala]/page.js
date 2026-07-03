@@ -3,6 +3,9 @@ import { createClient } from '@/lib/supabase/server';
 import ChecklistList from '@/components/ChecklistList';
 import HeartsBackground from '@/components/HeartsBackground';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const CONFIG = {
   bebe: {
     titulo: 'Mala do bebê',
@@ -66,6 +69,20 @@ export default async function ChecklistPage({ params }) {
 
   const categorias = [...new Set((items || []).map((i) => i.categoria))];
 
+  const { data: ordemCategorias } = await supabase
+    .from('categoria_ordem')
+    .select('categoria, ordem, cor')
+    .eq('mala', params.mala);
+
+  const ordemMap = Object.fromEntries((ordemCategorias || []).map((o) => [o.categoria, o.ordem]));
+  const coresPorCategoria = Object.fromEntries((ordemCategorias || []).map((o) => [o.categoria, o.cor]));
+  categorias.sort((a, b) => {
+    const oa = ordemMap[a] ?? Infinity;
+    const ob = ordemMap[b] ?? Infinity;
+    if (oa !== ob) return oa - ob;
+    return a.localeCompare(b);
+  });
+
   const { data: relacoesArtigos } = await supabase
     .from('categoria_artigos')
     .select('categoria, posts(titulo, slug)')
@@ -98,6 +115,7 @@ export default async function ChecklistPage({ params }) {
             statusInicial={statusMap}
             logada={!!user}
             artigosPorCategoria={artigosPorCategoria}
+            coresPorCategoria={coresPorCategoria}
           />
 
           <div className="card mt-4 bg-rose-light/40 border-rose/20">

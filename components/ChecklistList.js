@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { resolverCorHex, hexParaRgba } from '@/lib/coresCategoria';
 
 const SELOS = {
   essencial: { cor: 'bg-sage', label: 'Essencial' },
@@ -26,14 +27,7 @@ function temConteudoExpansivel(item) {
   );
 }
 
-const CORES_CATEGORIA = [
-  { borda: 'border-sage', fundo: 'bg-sage/5' },
-  { borda: 'border-rose', fundo: 'bg-rose/5' },
-  { borda: 'border-marigold', fundo: 'bg-marigold/5' },
-  { borda: 'border-plum', fundo: 'bg-plum/5' },
-];
-
-export default function ChecklistList({ items, categorias, statusInicial, logada, artigosPorCategoria = {} }) {
+export default function ChecklistList({ items, categorias, statusInicial, logada, artigosPorCategoria = {}, coresPorCategoria = {} }) {
   const [status, setStatus] = useState(statusInicial);
   const [abertos, setAbertos] = useState(new Set());
   const [categoriasAbertas, setCategoriasAbertas] = useState(() => new Set());
@@ -109,10 +103,14 @@ export default function ChecklistList({ items, categorias, statusInicial, logada
         const marcadosCategoria = itensCategoria.filter((i) => status[i.id]).length;
         const artigos = artigosPorCategoria[categoria] || [];
         const menuArtigosAberto = artigosAbertos.has(categoria);
-        const cor = CORES_CATEGORIA[index % CORES_CATEGORIA.length];
+        const corHex = resolverCorHex(coresPorCategoria[categoria], index);
 
         return (
-          <div key={categoria} className={`mb-4 rounded-card border-l-4 ${cor.borda} ${cor.fundo} p-4`}>
+          <div
+            key={categoria}
+            className="mb-4 rounded-card border-l-4 p-4"
+            style={{ borderLeftColor: corHex, backgroundColor: hexParaRgba(corHex, 0.06) }}
+          >
             <div className="flex items-center justify-between gap-2 mb-3">
               <button
                 onClick={() => toggleCategoria(categoria)}
